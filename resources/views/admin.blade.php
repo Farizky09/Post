@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AdminLTE 3 | Dashboard</title>
+  <title>Page | Admin</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -213,7 +213,7 @@
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                Menu
+               Menu
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -221,17 +221,19 @@
               <li class="nav-item">
                 <a href="./index.html" class="nav-link active">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Home</p>
+                  <p>Dashboard</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="./index2.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Post</p>
                 </a>
               </li>
               
             </ul>
           </li>
-          
-          
-            </ul>
-          </li>
-          
+         
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -268,9 +270,9 @@
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3>150</h3>
+                <h3>{{App\Models\Post::count()}}</h3>
 
-                <p>New Orders</p>
+                <p>Posts</p>
               </div>
               <div class="icon">
                 <i class="ion ion-bag"></i>
@@ -283,9 +285,10 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>53<sup style="font-size: 20px">%</sup></h3>
+                <h3>{{App\Models\Comment::count()}}</h3>
 
-                <p>Bounce Rate</p>
+                
+                <p>Comment</p>
               </div>
               <div class="icon">
                 <i class="ion ion-stats-bars"></i>
@@ -315,11 +318,15 @@
                       </button>
                       </div>
                       <div class="modal-body">
-                        <form action="/post/store" method="post">
+                        <form action="{{route('insertPost')}}" method="post">
                           {{ csrf_field() }}
                           <div class="form-group">
+                            <label for="title" class="col-form-label">Judul:</label>
+                            <input type="text" class="form-control" name="title" id="title">
+                          </div>
+                          <div class="form-group">
                             <label>Postingan</label>
-                            <textarea name="text" class="form-control" rows="3" placeholder="Masukkan Inspirasi anda"></textarea>
+                            <textarea name="body" class="form-control" rows="3"></textarea>
                           </div>
                       </div>
                       <div class="modal-footer justify-content-between">
@@ -340,33 +347,88 @@
                   <table id="example2" class="table table-bordered table-hover dataTable dtr-inline" aria-describedby="example2_info">
                   <thead>
                   <tr>
-                    <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Nomor</th><th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Post</th><th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Waktu</th>
+                    <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Judul</th><th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Slug</th><th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Isi</th>
                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Action</th></tr>
                   </thead>
                   <tbody>
-                    @php $no = 1; @endphp
-                    {{--  @foreach($posts as $p) 
-                      <tr>
-                        <td>{{ $no++ }}</td>
-                        <td>{{ $p->text }}</td>
-                        <td>{{ $p->created_at }}</td>
-                        <td>
-                          <a href="/post/edit/{{ $p->id }}">Edit</a>
+                   @foreach ($posts as $item)
+                   <div class="modal fade" id="edit{{$item->id}}">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                      <h4 class="modal-title">Default Modal</h4>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="{{route('updatePost',$item->id)}}" method="post">
+                          {{ csrf_field() }}
+                          <div class="form-group">
+                            <label for="title" class="col-form-label">Judul:</label>
+                            <input type="text" class="form-control" name="title" id="title" value="{{$item->title}}">
+                          </div>
+                          <div class="form-group">
+                            <label>Postingan</label>
+                            <textarea name="body" class="form-control" rows="3">{{$item->body}}</textarea>
+                          </div>
+                      </div>
+                      <div class="modal-footer justify-content-between">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Save changes</button>
+                      </form>
+                      </div>
+                    </div>
+                    <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                  </div>
+
+                  <div class="modal fade" id="detail{{$item->id}}">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                      <h4 class="modal-title">Detail Postingan</h4>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                      </div>
+                      <div class="modal-body">
+                          <div class="form-group">
+                            <label for="title" class="col-form-label">Judul:</label>
+                            <input type="text" disabled class="form-control" name="title" id="title" value="{{$item->title}}">
+                          </div>
+                          <div class="form-group">
+                            <label>Postingan</label>
+                            <textarea name="body" disabled class="form-control" rows="3">{{$item->body}}</textarea>
+                          </div>
+                      </div>
+                      
+                      <div class="modal-footer justify-content-between">
+                        <h4>Jumlah Komentar Postingan: {{App\Models\Comment::where('id_post','=',$item->id)->count()}}</h4>
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                    <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                  </div>
+                       <tr>
+                         <td>{{ \Illuminate\Support\Str::limit($item->title, 50, $end='...') }}</td>
+                         <td>{{ \Illuminate\Support\Str::limit($item->slug, 50, $end='...') }}</td>
+                         <td>{{ \Illuminate\Support\Str::limit($item->body, 50, $end='...')  }}</td>
+                         <td>
+                           <button class="btn btn-success" type="button"  data-toggle="modal" data-target="#edit{{$item->id}}">Edit</button>
+                           |
+                           <button type="button" class="btn btn-info"  data-toggle="modal" data-target="#detail{{$item->id}}">Detail</button>
                           |
-                          <a onclick="return confirm('Yakin mau didelete?')" href="/post/hapus/{{ $p->id }}">Hapus</a>
+                          <a class="btn btn-danger" href="{{route('deletePost',$item->id)}}">Hapus</a>
                         </td>
-                      </tr>
-                      @endforeach  --}}
-                      @foreach ($posts as $post)
-                                                            {{ $post->title }}
-                                                            {{ $post->author->username }}">
-                                                            {{ $post->author->name }}
-                                                            {{ $post->slug }}
-                                                            {{ $post->excerpt }}
-                                                        @endforeach
+                       </tr>
+                   @endforeach
                 </tbody>
 
-                </table></div></div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="example2_info" role="status" aria-live="polite">Showing 1 to 10 of 57 entries</div></div><div class="col-sm-12 col-md-7"><div class="dataTables_paginate paging_simple_numbers" id="example2_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="example2_previous"><a href="#" aria-controls="example2" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li><li class="paginate_button page-item active"><a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example2" data-dt-idx="2" tabindex="0" class="page-link">2</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example2" data-dt-idx="3" tabindex="0" class="page-link">3</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example2" data-dt-idx="4" tabindex="0" class="page-link">4</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example2" data-dt-idx="5" tabindex="0" class="page-link">5</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example2" data-dt-idx="6" tabindex="0" class="page-link">6</a></li><li class="paginate_button page-item next" id="example2_next"><a href="#" aria-controls="example2" data-dt-idx="7" tabindex="0" class="page-link">Next</a></li></ul></div></div></div></div>
+                </table>
               </div>
               <!-- /.card-body -->
             </div>
@@ -379,7 +441,6 @@
     </section>
     <!-- /.content -->
   </div>
-  <!-- /.content-wrapper -->
   <footer class="main-footer">
     <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
     All rights reserved.
